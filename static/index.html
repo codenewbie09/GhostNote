@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GhostNote | Secure Self-Destructing Messages</title>
+
+    <!-- Google Fonts: 'Outfit' for a modern, tech look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg-dark: #0f172a;
+        --bg-card: rgba(30, 41, 59, 0.7);
+        --accent: #38bdf8;
+        --accent-glow: rgba(56, 189, 248, 0.3);
+        --danger: #f43f5e;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--bg-dark);
+        background-image:
+          radial-gradient(
+            circle at 15% 50%,
+            rgba(56, 189, 248, 0.08),
+            transparent 25%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(244, 63, 94, 0.05),
+            transparent 25%
+          );
+        color: var(--text-main);
+        font-family: "Outfit", sans-serif;
+        overflow: hidden;
+      }
+
+      /* Subtle Background Animation */
+      body::before {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: drift 60s linear infinite;
+        z-index: -1;
+        opacity: 0.5;
+      }
+
+      @keyframes drift {
+        from {
+          transform: translateY(0);
+        }
+
+        to {
+          transform: translateY(-50px);
+        }
+      }
+
+      .card {
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        border-radius: 24px;
+        background: var(--bg-card);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        margin: 0 0 10px 0;
+        background: linear-gradient(135deg, #fff 30%, var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+      }
+
+      p {
+        color: var(--text-muted);
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      textarea {
+        width: 100%;
+        height: 120px;
+        background: rgba(15, 23, 42, 0.6);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px;
+        resize: none;
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      button {
+        margin-top: 20px;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), #3b82f6);
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -10px var(--accent-glow);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .link-box {
+        margin-top: 24px;
+        background: rgba(15, 23, 42, 0.8);
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 12px;
+      }
+
+      .link-text {
+        flex-grow: 1;
+        flex-shrink: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .copy-btn {
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: background 0.2s;
+        width: auto;
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      .copy-btn:hover {
+        background: var(--accent);
+        color: #0f172a;
+      }
+
+      .secret {
+        font-size: 1.5rem;
+        margin: 30px 0;
+        white-space: pre-wrap;
+        font-weight: 300;
+        line-height: 1.4;
+        color: white;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      }
+
+      .status-text {
+        color: var(--danger);
+        font-weight: 500;
+        margin-bottom: 10px;
+        min-height: 24px;
+      }
+
+      .fade-out {
+        animation: fadeOut 2s forwards;
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+          filter: blur(0);
+        }
+
+        50% {
+          opacity: 0.5;
+          transform: scale(1.05);
+          filter: blur(2px);
+        }
+
+        100% {
+          opacity: 0;
+          transform: scale(0.9);
+          filter: blur(10px);
+        }
+      }
+
+      /* Loading Spinner */
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        border-top-color: #000;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card" id="app"></div>
+
+    <script>
+      const app = document.getElementById("app");
+
+      // Detect mode
+      if (window.location.pathname.startsWith("/notes/")) {
+        showSecret();
+      } else {
+        showCreate();
+      }
+
+      function showCreate() {
+        app.innerHTML = `
+          <h1>GhostNote</h1>
+          <p>Secure self-destructing messages. <br>Read once, then gone forever.</p>
+          <textarea id="note" placeholder="Type your secret here..."></textarea>
+          <button id="createBtn" onclick="createNote()">Create Secret Link</button>
+          <div id="result"></div>
+        `;
+      }
+
+      async function createNote() {
+        const content = document.getElementById("note").value;
+        const btn = document.getElementById("createBtn");
+
+        if (!content.trim()) return;
+
+        // Loading State
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> Encrypting...`;
+
+        try {
+          const res = await fetch("/api/notes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content }),
+          });
+
+          const data = await res.json();
+
+          document.getElementById("result").innerHTML = `
+            <div class="link-box">
+              <span class="link-text">${data.link}</span>
+              <button class="copy-btn" onclick="copyToClipboard('${data.link}')">Copy</button>
+            </div>
+          `;
+
+          // Reset Button
+          btn.disabled = false;
+          btn.innerHTML = "Create Another Link";
+        } catch (err) {
+          btn.disabled = false;
+          btn.innerText = "Error. Try again.";
+          console.error(err);
+        }
+      }
+
+      async function showSecret() {
+        const token = new URLSearchParams(window.location.search).get("token");
+        const id = window.location.pathname.split("/").pop();
+
+        try {
+          const res = await fetch(`/api/notes/${id}?token=${token}`);
+          if (!res.ok) throw new Error("gone");
+
+          const data = await res.json();
+
+          app.innerHTML = `
+            <h2>Secure Message</h2>
+            <div class="secret" id="secret">${data.content}</div>
+            <div class="status-text" id="status">Decrypting complete. Destroying in...</div>
+          `;
+
+          startCountdown();
+        } catch {
+          app.innerHTML = `
+            <h1>💨</h1>
+            <h2 style="color: var(--text-muted)">Message Destroyed</h2>
+            <p>This note has already been read or has expired.</p>
+          `;
+        }
+      }
+
+      function startCountdown() {
+        let t = 5;
+        const status = document.getElementById("status");
+        const secret = document.getElementById("secret");
+
+        status.innerText = `Self-destructing in ${t} seconds...`;
+
+        const interval = setInterval(() => {
+          t--;
+          if (t > 0) {
+            status.innerText = `Self-destructing in ${t} seconds...`;
+          } else {
+            clearInterval(interval);
+            status.innerText = "Message Destroyed";
+            status.style.color = "var(--text-muted)";
+            secret.classList.add("fade-out");
+          }
+        }, 1000);
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          // Find the button that was clicked and temporarily change text
+          const btns = document.getElementsByClassName("copy-btn");
+          if (btns.length > 0) {
+            btns[0].innerText = "Copied!";
+            setTimeout(() => (btns[0].innerText = "Copy"), 2000);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

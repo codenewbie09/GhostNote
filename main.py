@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 # ---------------- CONFIG ----------------
 load_dotenv()
-
+BASE_URL = os.getenv("BASE_URL", "https://localhost:8000")
 secret_key = os.getenv("GHOSTNOTE_SECRET_KEY")
 if not secret_key:
     raise RuntimeError("Missing GHOSTNOTE_SECRET_KEY in .env")
@@ -82,7 +82,7 @@ async def create_note(request: NoteRequest, http_request: Request):
     return {
         "note_id": note_id,
         "access_token": access_token,
-        "link": f"http://localhost:8000/notes/{note_id}?token={access_token}",
+        "link": f"{BASE_URL}/notes/{note_id}?token={access_token}",
     }
 
 

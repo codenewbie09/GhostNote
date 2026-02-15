@@ -11,11 +11,11 @@ A secure, self-destructing messaging service built with **FastAPI** and **Redis*
 
 ## Features
 
-- ** End-to-End Encryption:** Notes are encrypted (AES-128) using `cryptography.fernet` before storage.
-- ** Self-Destruct:** Uses Redis `GETDEL` for atomic read-and-destroy operations.
-- ** High Performance:** Built with `asyncio` and Redis for sub-millisecond latency.
-- ** Rate Limiting:** Protects against spam/abuse using Redis-based rate limiting.
-- ** Modern UI:** A clean, "human-made" responsive interface using vanilla CSS (no frameworks).
+- **End-to-End Encryption:** Notes are encrypted (AES-128) using `cryptography.fernet` before storage.
+- **Self-Destruct:** Uses Redis `GETDEL` for atomic read-and-destroy operations.
+- **High Performance:** Built with `asyncio` and Redis for sub-millisecond latency.
+- **Rate Limiting:** Protects against spam/abuse using Redis-based rate limiting.
+- **Modern UI:** A clean, "human-made" responsive interface using vanilla CSS (no frameworks).
 
 ## Tech Stack
 
@@ -78,7 +78,7 @@ A secure, self-destructing messaging service built with **FastAPI** and **Redis*
 
 This project is deployed on Render:
 
-- \*\*Backend (FastAPI): [ghostnote-xa32.onrender.com](https://ghostnote-xa32.onrender.com)
+- **Backend (FastAPI):** [ghostnote-xa32.onrender.com](https://ghostnote-xa32.onrender.com)
 - **Database:** Render Redis (Free Tier)
 
 ## License

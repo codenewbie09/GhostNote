@@ -21,7 +21,8 @@ if not secret_key:
 
 cipher_suite = Fernet(secret_key.encode())
 
-r = redis.Redis(host="localhost", port=6380, db=0, decode_responses=False)
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6380")
+r = redis.from_url(REDIS_URL, decode_responses=False)
 
 RATE_LIMIT = 5
 WINDOW_SECONDS = 60
